@@ -120,7 +120,11 @@ func _build_crosshair_light() -> void:
 func _build_pistol() -> void:
     _clear_weapon()
     weapon_mode = "PISTOL"
-    var packed: PackedScene = load("res://assets/models/hellforged_handcannon.glb")
+    var packed_resource: Resource = load("res://assets/models/hellforged_handcannon.glb")
+    if packed_resource == null or not (packed_resource is PackedScene):
+        push_error("Could not load imported model scene: res://assets/models/hellforged_handcannon.glb. Run Godot editor import before launching/exporting.")
+        return
+    var packed: PackedScene = packed_resource as PackedScene
     var model: Node3D = packed.instantiate()
     model.name = "Hellforged Handcannon"
     model.scale = Vector3.ONE * 0.92
@@ -129,7 +133,11 @@ func _build_pistol() -> void:
 func _build_sword() -> void:
     _clear_weapon()
     weapon_mode = "SWORD"
-    var packed: PackedScene = load("res://assets/models/oathbreaker_greatsword.glb")
+    var packed_resource: Resource = load("res://assets/models/oathbreaker_greatsword.glb")
+    if packed_resource == null or not (packed_resource is PackedScene):
+        push_error("Could not load imported model scene: res://assets/models/oathbreaker_greatsword.glb. Run Godot editor import before launching/exporting.")
+        return
+    var packed: PackedScene = packed_resource as PackedScene
     var model: Node3D = packed.instantiate()
     model.name = "Oathbreaker Greatsword"
     model.scale = Vector3.ONE * 0.78

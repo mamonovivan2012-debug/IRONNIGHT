@@ -73,3 +73,10 @@ These are actual imported GLB model assets used by the gameplay scripts. They ar
 - Исправлены явные типы `Vector3` в `scripts/player.gd` и `Vector2` в `scripts/hud.gd`.
 - GitHub Actions выполняет headless-импорт ресурсов GLB до экспорта Windows.
 - Windows export preset настроен на отдельный PCK: EXE и PCK должны лежать рядом.
+
+
+### Исправления компиляции и импорта моделей
+
+Перед экспортом GitHub Actions выполняет два прохода Godot Editor: импорт исходных ресурсов и повторное сканирование проекта. Это необходимо для GLB-моделей. Если модель не импортировалась, workflow завершится с понятной ошибкой до создания EXE/PCK.
+
+В гранате тип расстояния до врага указан явно, а объекты группы `monsters` проверяются перед вызовом урона.

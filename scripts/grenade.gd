@@ -4,7 +4,11 @@ var fuse := 3.0
 var exploded := false
 
 func _ready() -> void:
-    var packed: PackedScene = load("res://assets/models/hellfire_grenade.glb")
+    var packed_resource: Resource = load("res://assets/models/hellfire_grenade.glb")
+    if packed_resource == null or not (packed_resource is PackedScene):
+        push_error("Could not load imported model scene: res://assets/models/hellfire_grenade.glb. Run Godot editor import before launching/exporting.")
+        return
+    var packed: PackedScene = packed_resource as PackedScene
     var model: Node3D = packed.instantiate()
     model.name = "Hellfire fragmentation grenade"
     add_child(model)
@@ -39,10 +43,13 @@ func _explode() -> void:
         return
     exploded = true
     var center := global_position
-    for mob in get_tree().get_nodes_in_group("monsters"):
-        var distance := mob.global_position.distance_to(center)
+    for candidate: Node in get_tree().get_nodes_in_group("monsters"):
+        var mob: Node3D = candidate as Node3D
+        if mob == null or not mob.has_method("take_damage"):
+            continue
+        var distance: float = mob.global_position.distance_to(center)
         if distance < 9.0:
-            mob.take_damage(155.0 * (1.0 - distance / 12.0), center)
+            mob.call("take_damage", 155.0 * (1.0 - distance / 12.0), center)
     var flash := OmniLight3D.new()
     flash.position = center
     flash.light_color = Color(1.0, 0.22, 0.045)

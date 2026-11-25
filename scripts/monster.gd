@@ -24,7 +24,11 @@ func _ready() -> void:
     capsule.position.y = 1.12
     add_child(capsule)
 
-    var packed: PackedScene = load("res://assets/models/ash_titan.glb")
+    var packed_resource: Resource = load("res://assets/models/ash_titan.glb")
+    if packed_resource == null or not (packed_resource is PackedScene):
+        push_error("Could not load imported model scene: res://assets/models/ash_titan.glb. Run Godot editor import before launching/exporting.")
+        return
+    var packed: PackedScene = packed_resource as PackedScene
     body_mesh = packed.instantiate()
     body_mesh.name = "Ash Titan — imported character model"
     body_mesh.scale = Vector3.ONE
