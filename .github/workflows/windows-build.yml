@@ -32,7 +32,7 @@ jobs:
           chmod +x "$GODOT_BIN"
           echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
           curl -L --fail --retry 3 \
-            "https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" \
             -o "$HOME/godot/templates.tpz"
           unzip -q "$HOME/godot/templates.tpz" -d "$HOME/godot/templates"
           cp -a "$HOME/godot/templates/templates/." "$HOME/.local/share/godot/export_templates/${TEMPLATE_DIR}/"
