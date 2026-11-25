@@ -1,0 +1,82 @@
+name: Build Windows EXE + PCK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  export-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Godot 4.3 and Windows export templates
+        shell: bash
+        run: |
+          set -euo pipefail
+          GODOT_VERSION="4.3"
+          GODOT_TAG="4.3-stable"
+          TEMPLATE_DIR="4.3.stable"
+          mkdir -p "$HOME/godot" "$HOME/.local/share/godot/export_templates/${TEMPLATE_DIR}"
+          curl -L --fail --retry 3 \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_TAG}/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip" \
+            -o "$HOME/godot/godot.zip"
+          unzip -q "$HOME/godot/godot.zip" -d "$HOME/godot"
+          GODOT_BIN="$(find "$HOME/godot" -maxdepth 2 -type f -name 'Godot_v*linux.x86_64' | head -n 1)"
+          test -n "$GODOT_BIN"
+          chmod +x "$GODOT_BIN"
+          echo "GODOT_BIN=$GODOT_BIN" >> "$GITHUB_ENV"
+          curl -L --fail --retry 3 \
+            "https://downloads.tuxfamily.org/godotengine/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-stable_export_templates.tpz" \
+            -o "$HOME/godot/templates.tpz"
+          unzip -q "$HOME/godot/templates.tpz" -d "$HOME/godot/templates"
+          cp -a "$HOME/godot/templates/templates/." "$HOME/.local/share/godot/export_templates/${TEMPLATE_DIR}/"
+
+      - name: Import project resources
+        run: "$GODOT_BIN --headless --path . --editor --quit"
+
+      - name: Export Windows EXE and separate PCK
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+          "$GODOT_BIN" --headless --path . --export-release "Windows Desktop" build/IRON_NIGHT.exe
+          test -s build/IRON_NIGHT.exe || { echo "ERROR: EXE was not created"; exit 1; }
+          test -s build/IRON_NIGHT.pck || { echo "ERROR: separate PCK was not created"; exit 1; }
+          # Convenience launcher: EXE and PCK must stay side by side.
+          cat > build/Start_IRON_NIGHT.bat <<'BAT'
+          @echo off
+          cd /d "%~dp0"
+          if not exist "IRON_NIGHT.exe" (
+            echo IRON_NIGHT.exe not found.
+            pause
+            exit /b 1
+          )
+          if not exist "IRON_NIGHT.pck" (
+            echo IRON_NIGHT.pck not found. Keep it beside the EXE.
+            pause
+            exit /b 1
+          )
+          start "" "%~dp0IRON_NIGHT.exe"
+          BAT
+          cd build
+          zip -q -r ../IRON_NIGHT-Windows.zip IRON_NIGHT.exe IRON_NIGHT.pck Start_IRON_NIGHT.bat
+          cd ..
+          test -s IRON_NIGHT-Windows.zip
+
+      - name: Upload Windows build (EXE + PCK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: IRON_NIGHT-Windows-x86_64
+          path: |
+            build/IRON_NIGHT.exe
+            build/IRON_NIGHT.pck
+            build/Start_IRON_NIGHT.bat
+            IRON_NIGHT-Windows.zip
+          if-no-files-found: error
+          retention-days: 14
