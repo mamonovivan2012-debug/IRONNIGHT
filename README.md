@@ -66,3 +66,10 @@ These are actual imported GLB model assets used by the gameplay scripts. They ar
 6. Для запуска распакуй `IRON_NIGHT-Windows.zip` и оставь EXE и PCK в одной папке. Запусти EXE или `Start_IRON_NIGHT.bat`.
 
 Сборка выполняется на GitHub-hosted Ubuntu runner с официальными Godot 4.3 Windows export templates. Сам EXE создаётся в Actions; он не хранится в Git-репозитории. Первый запуск workflow скачивает движок и шаблоны экспорта. Workflow проверяет наличие обоих файлов и завершает сборку ошибкой, если EXE или PCK отсутствует. Если экспорт завершится ошибкой, открой лог шага **Export Windows EXE and separate PCK**.
+
+
+## Исправления запуска и экспорта
+- Граната создаётся из `scenes/grenade.tscn` (PackedScene), а не из GDScript-файла.
+- Исправлены явные типы `Vector3` в `scripts/player.gd` и `Vector2` в `scripts/hud.gd`.
+- GitHub Actions выполняет headless-импорт ресурсов GLB до экспорта Windows.
+- Windows export preset настроен на отдельный PCK: EXE и PCK должны лежать рядом.

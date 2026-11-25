@@ -138,7 +138,7 @@ func _input(event: InputEvent) -> void:
     elif event is InputEventScreenDrag:
         if event.index == move_touch:
             var center := Vector2(108, get_viewport().get_visible_rect().size.y - 112)
-            var v := (event.position - center) / 55.0
+            var v: Vector2 = (event.position - center) / 55.0
             joystick_vector = v.limit_length(1.0)
             player.set_mobile_move(joystick_vector)
             joystick_knob.position = Vector2(42, get_viewport().get_visible_rect().size.y - 178) + Vector2(39, 39) + joystick_vector * 38

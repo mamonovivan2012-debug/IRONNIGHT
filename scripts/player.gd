@@ -3,7 +3,7 @@ extends CharacterBody3D
 signal health_changed(value: float, maximum: float)
 signal died
 
-const GRENADE = preload("res://scripts/grenade.gd")
+const GRENADE: PackedScene = preload("res://scenes/grenade.tscn")
 var speed := 8.5
 var jump_velocity := 5.8
 var gravity := 18.0
@@ -204,7 +204,7 @@ func _swing_sword() -> void:
     var center := camera.global_position + -camera.global_basis.z * 2.6
     for mob in get_tree().get_nodes_in_group("monsters"):
         if mob.global_position.distance_to(center) < 4.3:
-            var to_mob := (mob.global_position - camera.global_position).normalized()
+            var to_mob: Vector3 = (mob.global_position - camera.global_position).normalized()
             if camera.global_basis.z.dot(-to_mob) > -0.25:
                 mob.take_damage(78.0, mob.global_position)
 
@@ -213,7 +213,7 @@ func _throw_grenade() -> void:
         return
     grenades -= 1
     grenade_cooldown = 0.55
-    var grenade = GRENADE.instantiate()
+    var grenade: RigidBody3D = GRENADE.instantiate()
     get_tree().current_scene.add_child(grenade)
     grenade.global_position = camera.global_position + -camera.global_basis.z * 0.8
     grenade.launch(-camera.global_basis.z * 12.0 + Vector3.UP * 5.5)
